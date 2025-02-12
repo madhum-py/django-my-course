@@ -1,0 +1,1047 @@
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: white;
+    color: black;
+    text-align: center;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* Header */
+header {
+    background: white;
+    padding: 15px 5%;
+    border-bottom: 1px solid #004fa3;
+    /* Thinner line for subtle separation */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Scroll Animation */
+
+.scroll-fade {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-fade.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* Scroll Animation End */
+
+.custom-hr {
+    width: 60%;
+    /* Adjust width as needed */
+    height: 2px;
+    /* Adjust thickness */
+    border: none;
+    margin: 20px auto;
+    background: linear-gradient(to right, transparent, #004fa3, transparent);
+}
+
+/* Institute Name & Tagline as a Logo (Top Left) */
+.header-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.header-logo h1 {
+    font-size: 1.8em;
+    color: #004fa3;
+    /* Updated branding color */
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-logo .tagline {
+    font-size: 1em;
+    font-style: italic;
+    color: black;
+    opacity: 0.8;
+    margin-top: 3px;
+    font-weight: 600;
+}
+
+/* Navbar (Top Right) */
+.navbar {
+    display: flex;
+    gap: 20px;
+}
+
+.navbar a {
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1em;
+    transition: 0.3s;
+}
+
+.navbar a:hover {
+    color: #004fa3;
+    /* Updated branding color */
+}
+
+
+/* Batches Table */
+.batch-section {
+    margin-top: 30px;
+}
+
+/* Available Batches Table - Register Button */
+.batch-section table button {
+    background: #004fa3;
+    color: white;
+    font-size: 0.9em; /* Adjust text size */
+    font-weight: 600;
+    padding: 6px 12px; /* Reduce padding for a compact look */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: auto; /* Keeps it from stretching */
+    min-width: 100px; /* Ensures consistency */
+}
+
+/* Hover Effect */
+.batch-section table button:hover {
+    background: #003b7a;
+}
+
+.available-batches-header {
+    font-size: 1em; /* Standard readable size */
+    font-weight: 600;
+    text-align: center;
+    color: #004fa3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px; /* Less gap for a compact look */
+    padding: 6px 12px; /* Balanced padding */
+    background: white;
+    border: 1.5px solid #004fa3; /* Subtle but visible border */
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    width: fit-content;
+    margin: 12px auto; /* Adjusted margin for spacing */
+}
+
+/* Adjust icon inside the header */
+.available-batches-header i {
+    font-size: 16px; /* Proportionate to text */
+    color: #004fa3;
+}
+
+
+table {
+    width: 70%;
+    margin: auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #0058b8;
+    box-shadow: 0px 0px 15px rgba(0, 102, 255, 0.15);
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: center;
+    color: black;
+    font-size: 0.9em;
+}
+
+th {
+    background: #0058b8;
+    color: white;
+    font-weight: 600;
+}
+
+td {
+    background: #f9f9f9;
+}
+
+/* Reduce table width further for larger screens */
+@media (min-width: 1024px) {
+    table {
+        width: 60%;
+    }
+
+    th,
+    td {
+        padding: 6px;
+        font-size: 0.85em;
+    }
+}
+
+/* Buttons */
+button {
+    background: #0058b8;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: black;
+    color: white;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+/* Show modal */
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    text-align: left;
+    color: black;
+    box-shadow: 0px 0px 20px rgba(0, 102, 255, 0.3);
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+    background: #0058b8;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover {
+    background: black;
+    color: white;
+}
+
+/* Form */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    padding: 10px;
+    border: 2px solid #0058b8;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+input:focus {
+    border-color: black;
+    outline: none;
+    box-shadow: 0px 0px 8px rgba(0, 102, 255, 0.3);
+}
+
+.selected-batch-display {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: white;
+    background: #0058b8;
+    padding: 8px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+    display: none;
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0058b8;
+}
+
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: block;
+    }
+
+    .navbar {
+        display: none;
+    }
+
+    /* Sidebar for mobile */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: -250px;
+        width: 250px;
+        height: 100%;
+        background: white;
+        box-shadow: -3px 0px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        padding-top: 60px;
+        transition: right 0.3s ease-in-out;
+        z-index: 1000;
+    }
+
+    .sidebar.show {
+        right: 0;
+    }
+
+    .sidebar a {
+        padding: 15px;
+        text-align: left;
+        font-size: 1.2em;
+        font-weight: bold;
+        text-decoration: none;
+        color: black;
+        transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+        color: #0058b8;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        z-index: 999;
+    }
+
+    .sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+@media (min-width: 769px) {
+    .navbar {
+        display: flex;
+        gap: 20px;
+    }
+
+    .sidebar {
+        display: none;
+    }
+}
+
+
+/* Hamburger Menu */
+.hamburger-menu {
+    display: none;
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0058b8;
+}
+
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: block;
+    }
+
+    /* Hide normal navbar and use sidebar instead */
+    .navbar {
+        display: none;
+    }
+
+    /* Sidebar for mobile */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: -250px;
+        /* Start off-screen */
+        width: 250px;
+        height: 100%;
+        background: white;
+        box-shadow: -3px 0px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        padding-top: 60px;
+        transition: right 0.3s ease-in-out;
+        z-index: 1000;
+    }
+
+    /* Show sidebar when active */
+    .sidebar.show {
+        right: 0;
+    }
+
+    /* Sidebar links */
+    .sidebar a {
+        padding: 15px;
+        text-align: left;
+        font-size: 1.2em;
+        font-weight: bold;
+        text-decoration: none;
+        color: black;
+        transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+        color: #0058b8;
+    }
+
+    /* Close sidebar when clicking outside */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        z-index: 999;
+    }
+
+    .sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* Ensure normal navbar is visible in desktop view */
+@media (min-width: 769px) {
+    .navbar {
+        display: flex;
+        gap: 20px;
+    }
+
+    .sidebar {
+        display: none;
+        /* Hide sidebar on desktop */
+    }
+}
+
+
+/* Sidebar Navigation */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -250px;
+    /* Start off-screen */
+    width: 250px;
+    height: 100%;
+    background: white;
+    box-shadow: -3px 0px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.sidebar.show {
+    right: 0;
+    /* Slide in */
+}
+
+.sidebar a {
+    padding: 15px;
+    font-size: 1.1em;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    transition: 0.3s;
+    text-align: center;
+    display: block;
+}
+
+.sidebar a:hover {
+    background: #0058b8;
+    color: white;
+}
+
+/* Overlay for clicking outside */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    z-index: 999;
+}
+
+.overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/* Course Section - Centered */
+.course-section {
+    text-align: center;
+    margin: 20px auto;
+    padding: 10px 0;
+    max-width: 800px;
+}
+
+/*------------------------------------------------------------------- */
+/* Course Tiles - Desktop: Single Row, Mobile: 2 per row */
+.course-details {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for desktop */
+    gap: 10px;
+    justify-content: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Course Tiles */
+.tile {
+    background: linear-gradient(135deg, #004fa3, #0077cc);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    text-wrap: balance;
+}
+
+/* Icon Styling */
+.tile i {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+/* Hover Effect */
+.tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile View: 2 Tiles Per Row */
+@media (max-width: 600px) {
+    .course-details {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 350px;
+        gap: 8px;
+    }
+
+    .tile {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    .tile i {
+        font-size: 16px;
+    }
+}
+
+/*------------------------------------------------------------------- */
+/* Course Pitch Section */
+.course-pitch {
+    background: rgba(0, 102, 255, 0.05);
+    border: 2px solid rgba(0, 102, 255, 0.2);
+    padding: 20px;
+    border-radius: 10px;
+    width: 70%;
+    /* Wider for better spacing */
+    max-width: 700px;
+    margin: 30px auto;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Section Heading */
+.course-pitch h2 {
+    color: #0058b8;
+    margin-bottom: 12px;
+    font-size: 1.6em;
+}
+
+/* Introductory Text */
+.pitch-intro {
+    font-size: 1em;
+    color: #002b5e;
+    margin-bottom: 18px;
+}
+
+/* Pitch Grid Layout */
+.pitch-grid {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    /* Keeps enough spacing */
+    flex-wrap: wrap;
+}
+
+/* Wider & Shorter Pitch Cards */
+.pitch-card {
+    background: white;
+    border-radius: 8px;
+    padding: 10px 16px;
+    /* Less padding to keep compact */
+    width: 200px;
+    /* Wider */
+    height: auto;
+    min-height: 75px;
+    /* Shorter height */
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.pitch-card:hover {
+    transform: scale(1.03);
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Icons */
+.pitch-card .icon {
+    font-size: 1.4em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Card Titles */
+.pitch-card h3 {
+    font-size: 1em;
+    margin-bottom: 4px;
+    color: #003b7a;
+}
+
+/* Card Text */
+.pitch-card p {
+    font-size: 0.8em;
+    /* Slightly smaller */
+    color: #004071;
+    line-height: 1.2;
+    /* Less height to keep compact */
+}
+
+/* Closing Line */
+.closing {
+    margin-top: 18px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+/* Mobile View: Cards Are Wider & Less Tall */
+@media (max-width: 600px) {
+    .pitch-grid {
+        justify-content: center;
+    }
+
+    .pitch-card {
+        width: 70%;
+        /* More width, less height */
+        min-width: 160px;
+        padding: 8px;
+    }
+}
+
+/*------------------------------------------------------------------- */
+/* Why Learn Python Section */
+
+.why-learn-python {
+    text-align: center;
+    padding: 30px 15px;
+    background: #F8F9FA;
+}
+
+.why-learn-python h2 {
+    font-size: 22px;
+    color: #004fa3;
+    margin-bottom: 15px;
+}
+
+/* 🌟 FLEXIBLE GRID */
+.why-reasons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    /* Less gap to save space */
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+/* 🌟 SMALLER CARDS */
+.reason {
+    background: white;
+    padding: 8px;
+    width: calc(50% - 6px);
+    /* ✅ Ensures 2 per row */
+    max-width: 140px;
+    /* ⬅️ Smaller than before */
+    height: 100px;
+    /* ⬇️ Reduced height */
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.reason:hover {
+    transform: translateY(-3px);
+}
+
+.reason i {
+    font-size: 20px;
+    /* ⬇️ Smaller icon */
+    color: #004fa3;
+    margin-bottom: 3px;
+}
+
+.reason h3 {
+    font-size: 12px;
+    /* ⬇️ Smaller text */
+    color: #000;
+}
+
+/* ✅ SUPER COMPACT FOR SMALL SCREENS */
+@media (max-width: 480px) {
+    .why-reasons {
+        max-width: 100%;
+    }
+
+    .reason {
+        width: calc(50% - 4px);
+        /* ✅ Forces 2 per row */
+        max-width: 120px;
+        /* ⬅️ Smaller */
+        height: 90px;
+        /* ⬇️ Smaller */
+    }
+
+    .reason i {
+        font-size: 18px;
+        /* ⬇️ Smaller */
+    }
+
+    .reason h3 {
+        font-size: 11px;
+        /* ⬇️ Smaller */
+    }
+}
+
+/*------------------------------------------------------------------- */
+/* Course Curriculum Section */
+
+.curriculum-section {
+    text-align: center;
+    margin: 40px auto;
+    padding: 20px;
+    max-width: 750px;
+}
+
+/* Section Title */
+.curriculum-title {
+    font-size: 22px;
+    color: #003b7a;
+    font-weight: 700;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+/* Curriculum Container */
+.curriculum-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Each Day Block */
+.curriculum-day {
+    border: none; /* Removed visible border */
+    border-radius: 8px; /* Slightly softer corners */
+    overflow: hidden;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.curriculum-day:hover {
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Collapsible Button */
+.curriculum-toggle {
+    width: 100%;
+    background: linear-gradient(to right, #004fa3, #003b7a);
+    color: white;
+    padding: 10px 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.3s, padding 0.3s;
+    border-radius: 8px; /* Matching soft corners */
+}
+
+.curriculum-toggle:hover {
+    background: linear-gradient(to right, #003b7a, #002855);
+    padding-left: 15px;
+}
+
+/* Expand/Collapse Icon */
+.toggle-icon {
+    font-weight: bold;
+    font-size: 16px;
+    margin-right: 12px;
+}
+
+/* Content (Initially Hidden) */
+.curriculum-content {
+    max-height: 0;
+    overflow: hidden;
+    background: #f8f9fa;
+    padding: 0 15px;
+    text-align: left;
+    transition: max-height 0.4s ease-out, padding 0.3s ease-out;
+    font-size: 14px;
+    border-radius: 0 0 8px 8px; /* Rounded corners only at the bottom */
+}
+
+/* Curriculum Content List */
+.curriculum-content ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.curriculum-content li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.curriculum-content li:last-child {
+    border-bottom: none;
+}
+
+/* When Expanded */
+.curriculum-content.show {
+    padding: 12px 15px;
+}
+
+/*------------------------------------------------------------------- */
+/* Career opportunities with Python Section */
+
+.career-section {
+    text-align: center;
+    margin: 40px auto;
+    padding: 20px;
+    max-width: 1000px; /* Adjust to control width on larger screens */
+}
+
+/* Section Title */
+.career-title {
+    font-size: 20px;
+    color: #004fa3;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+/* Career Cards Container */
+.career-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap on small screens */
+    justify-content: center; /* Center the cards horizontally */
+    align-items: center; /* Center the cards vertically */
+    gap: 20px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 960px; /* Keeps it centered and doesn't stretch */
+}
+
+/* Career Cards */
+.career-card {
+    background: linear-gradient(135deg, #004fa3, #0077cc);
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 160px; /* Width of cards */
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.career-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon */
+.career-icon {
+    font-size: 20px;
+    margin-bottom: 3px;
+}
+
+/* Text Styles */
+.career-card h3 {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 3px 0;
+}
+
+.career-card p {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* Responsive: Adjust for Mobile */
+@media (max-width: 500px) {
+    .career-container {
+        padding: 0;
+    }
+
+    .career-card {
+        width: 120px; /* Smaller cards on mobile */
+    }
+}
+
+
+/* Companies Section */
+.companies-section {
+    text-align: center;
+    margin: 30px auto;
+    padding: 15px;
+    max-width: 800px;
+}
+
+/* Section Heading */
+.companies-section h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #003366;
+}
+
+/* Company Logos Grid */
+.companies-logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+/* Individual Logo */
+.companies-logos img {
+    width: 60px;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Hover Effect */
+.companies-logos img:hover {
+    transform: scale(1.1);
+}
+
+/* Desktop View: 5 per row, centered */
+@media (min-width: 601px) {
+    .companies-logos img {
+        flex: 1 1 calc(20% - 15px); /* 5 per row */
+        max-width: 60px;
+    }
+}
+
+/* Mobile View: 4 per row, centered last row */
+@media (max-width: 600px) {
+    .companies-logos img {
+        flex: 1 1 calc(25% - 10px); /* 4 per row */
+        max-width: 50px;
+    }
+
+    /* Auto-center last row */
+    .companies-logos::after {
+        content: "";
+        display: block;
+        flex: 1 1 50%;
+        max-width: 50px;
+    }
+}
