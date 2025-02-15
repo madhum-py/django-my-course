@@ -15,7 +15,7 @@
     <header>
         <div class="header-logo">
             <h1>Meta Minds EdTech</h1>
-            <p class="tagline">"Empowering Minds with Code"</p>
+            <p class="tagline">Learn. Code. Grow.</p>
         </div>
         <!-- Hamburger menu button -->
         <button class="hamburger-menu" onclick="toggleSidebar()">☰</button>
@@ -402,14 +402,16 @@
                 {% csrf_token %}
                 <p class="selected-batch-display"><strong>Batch:</strong> <span id="selected-batch"></span></p>
 
+                <input type="hidden" id="batch" name="batch">  <!-- Hidden batch input -->
+
                 <label for="name">Name:</label>
-                <input type="text" id="name" required>
+                <input type="text" id="name" name="name" required>
 
                 <label for="whatsapp">WhatsApp Number:</label>
-                <input type="text" id="whatsapp" required>
+                <input type="text" id="whatsapp" name="whatsapp" required>
 
                 <label for="email">Email (optional):</label>
-                <input type="email" id="email">
+                <input type="email" id="email" name="email">
 
                 <button type="submit">Submit</button>
             </form>

@@ -1,9 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("Hello from script.js");
+
+    // Select elements
     const registerButtons = document.querySelectorAll(".register-btn");
     const modal = document.getElementById("register-modal");
     const closeModalButtons = document.querySelectorAll(".close-btn");
     const registrationForm = document.getElementById("registration-form");
     const selectedBatchDisplay = document.getElementById("selected-batch");
+    const batchInputField = document.getElementById("batch"); // Hidden input field for batch
     const successModal = document.getElementById("success-modal");
     const okButton = document.getElementById("ok-btn");
 
@@ -11,18 +15,74 @@ document.addEventListener("DOMContentLoaded", function () {
     registerButtons.forEach(button => {
         button.addEventListener("click", function () {
             const batchInfo = this.getAttribute("data-batch");
+
+            // Set batch info in the modal display
             if (selectedBatchDisplay) {
                 selectedBatchDisplay.textContent = batchInfo || "Not Available";
             }
-            if (registrationForm) {
-                registrationForm.reset();
+
+            // Set batch info in the hidden input field for form submission
+            if (batchInputField) {
+                batchInputField.value = batchInfo || "";
             }
+
+            if (registrationForm) {
+                registrationForm.reset(); // Reset form fields
+            }
+
             if (modal) {
                 modal.classList.add("show");
                 modal.classList.remove("hide");
             }
         });
     });
+
+    // Handle Form Submission via AJAX
+    if (registrationForm) {
+        registrationForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            console.log("Submitting Form:", {
+                batch: batchInputField.value,
+                name: registrationForm.querySelector("[name='name']").value,
+                whatsapp: registrationForm.querySelector("[name='whatsapp']").value,
+                email: registrationForm.querySelector("[name='email']").value
+            });
+
+            // Ensure batch value is populated
+            if (!batchInputField.value) {
+                alert("Error: Batch is missing. Please select a batch before registering.");
+                return;
+            }
+
+            const formData = new FormData(registrationForm);
+            formData.append("batch", batchInputField.value);
+
+            fetch("/register/", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": document.querySelector("input[name='csrfmiddlewaretoken']").value,
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        modal.classList.add("hide");
+                        setTimeout(() => {
+                            modal.classList.remove("show");
+                            successModal.classList.add("show");
+                        }, 300);
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert("Registration failed. Try again.");
+                    console.error("Error:", error);
+                });
+        });
+    }
 
     // Close Modal with Fade-Out
     closeModalButtons.forEach(button => {
@@ -36,22 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
-
-    // Handle Form Submission
-    if (registrationForm) {
-        registrationForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            if (modal) {
-                modal.classList.add("hide");
-                setTimeout(() => {
-                    modal.classList.remove("show");
-                    if (successModal) {
-                        successModal.classList.add("show");
-                    }
-                }, 300);
-            }
-        });
-    }
 
     // Close Success Modal
     if (okButton) {
@@ -119,15 +163,17 @@ document.addEventListener("DOMContentLoaded", function () {
     scrollElements.forEach(element => {
         scrollObserver.observe(element);
     });
+
+    // Sidebar Toggle
+    function toggleSidebar() {
+        document.querySelector(".sidebar").classList.toggle("show");
+        document.querySelector(".sidebar-overlay").classList.toggle("show");
+    }
+
+    function closeSidebar() {
+        document.querySelector(".sidebar").classList.remove("show");
+        document.querySelector(".sidebar-overlay").classList.remove("show");
+    }
+
+    console.log("Script.js Loaded");
 });
-
-// Sidebar Toggle
-function toggleSidebar() {
-    document.querySelector(".sidebar").classList.toggle("show");
-    document.querySelector(".sidebar-overlay").classList.toggle("show");
-}
-
-function closeSidebar() {
-    document.querySelector(".sidebar").classList.remove("show");
-    document.querySelector(".sidebar-overlay").classList.remove("show");
-}

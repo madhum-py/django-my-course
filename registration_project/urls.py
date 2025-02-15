@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from registration_app.views import register, index 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("registration_app.urls")),  # Include your app's URLs
+    path("", index, name="index"),  
+    path("register/", register, name="register"),  # ✅ Ensure this exists
 ]
 

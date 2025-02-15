@@ -10,10 +10,9 @@ body {
 
 /* Header */
 header {
-    background: white;
+    background: #004fa3; /* Brand color */
     padding: 15px 5%;
-    border-bottom: 1px solid #004fa3;
-    /* Thinner line for subtle separation */
+    border-bottom: none; /* Removing the border since background color is now applied */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -53,18 +52,17 @@ header {
 }
 
 .header-logo h1 {
-    font-size: 1.8em;
-    color: #004fa3;
-    /* Updated branding color */
+    font-size: 1.2em;
+    color: white; /* Adjusted to contrast with the blue background */
     font-weight: 600;
     margin: 0;
 }
 
 .header-logo .tagline {
-    font-size: 1em;
+    font-size: 0.8em;
     font-style: italic;
-    color: black;
-    opacity: 0.8;
+    color: white; /* Adjusted for contrast */
+    opacity: 0.9;
     margin-top: 3px;
     font-weight: 600;
 }
@@ -73,10 +71,11 @@ header {
 .navbar {
     display: flex;
     gap: 20px;
+    margin-left: auto;
 }
 
 .navbar a {
-    color: black;
+    color: white; /* Adjusted for contrast */
     text-decoration: none;
     font-weight: bold;
     font-size: 1em;
@@ -84,8 +83,7 @@ header {
 }
 
 .navbar a:hover {
-    color: #004fa3;
-    /* Updated branding color */
+    color: #ffcc00; /* Adding a complementary highlight on hover */
 }
 
 
@@ -396,7 +394,7 @@ input:focus {
     background: none;
     border: none;
     cursor: pointer;
-    color: #0058b8;
+    color: white;
 }
 
 @media (max-width: 768px) {
@@ -506,7 +504,7 @@ input:focus {
     padding: 15px;
     font-size: 1.1em;
     text-decoration: none;
-    color: black;
+    color: #004fa3;
     font-weight: bold;
     transition: 0.3s;
     text-align: center;
