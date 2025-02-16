@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("Hello from script.js");
+    console.log("Script.js Loaded");
 
     // Select elements
     const registerButtons = document.querySelectorAll(".register-btn");
@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const batchInputField = document.getElementById("batch"); // Hidden input field for batch
     const successModal = document.getElementById("success-modal");
     const okButton = document.getElementById("ok-btn");
+    const errorMessage = document.getElementById("error-message"); // Error message container
+    const submitButton = document.getElementById("submit-btn"); // Submit button
 
     // Open Registration Modal
     registerButtons.forEach(button => {
@@ -30,6 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 registrationForm.reset(); // Reset form fields
             }
 
+            if (errorMessage) {
+                errorMessage.textContent = ""; // Clear any previous error messages
+                errorMessage.style.display = "none";
+            }
+
             if (modal) {
                 modal.classList.add("show");
                 modal.classList.remove("hide");
@@ -37,50 +44,48 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Handle Form Submission via AJAX
+    // Handle Form Submission
     if (registrationForm) {
         registrationForm.addEventListener("submit", function (event) {
             event.preventDefault(); // Prevent default form submission
-
-            console.log("Submitting Form:", {
-                batch: batchInputField.value,
-                name: registrationForm.querySelector("[name='name']").value,
-                whatsapp: registrationForm.querySelector("[name='whatsapp']").value,
-                email: registrationForm.querySelector("[name='email']").value
-            });
-
-            // Ensure batch value is populated
-            if (!batchInputField.value) {
-                alert("Error: Batch is missing. Please select a batch before registering.");
-                return;
+    
+            if (submitButton) {
+                submitButton.disabled = true; // Disable button to prevent multiple clicks
             }
-
-            const formData = new FormData(registrationForm);
-            formData.append("batch", batchInputField.value);
-
+    
+            // Collect form data
+            const formData = new FormData(this);
+    
+            console.log("Submitting Form:", Object.fromEntries(formData.entries()));
+    
+            // Send AJAX request
             fetch("/register/", {
                 method: "POST",
                 body: formData,
-                headers: {
-                    "X-CSRFToken": document.querySelector("input[name='csrfmiddlewaretoken']").value,
-                },
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        modal.classList.add("hide");
-                        setTimeout(() => {
-                            modal.classList.remove("show");
-                            successModal.classList.add("show");
-                        }, 300);
-                    } else {
-                        alert("Error: " + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert("Registration failed. Try again.");
-                    console.error("Error:", error);
-                });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modal.classList.add("hide");
+                    setTimeout(() => {
+                        modal.classList.remove("show");
+                        successModal.classList.add("show");
+                    }, 300);
+                } else {
+                    errorMessage.textContent = data.message;
+                    errorMessage.style.display = "block";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                errorMessage.textContent = "An unexpected error occurred. Please try again.";
+                errorMessage.style.display = "block";
+            })
+            .finally(() => {
+                if (submitButton) {
+                    submitButton.disabled = false; // Re-enable submit button
+                }
+            });
         });
     }
 
@@ -174,6 +179,4 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".sidebar").classList.remove("show");
         document.querySelector(".sidebar-overlay").classList.remove("show");
     }
-
-    console.log("Script.js Loaded");
 });
