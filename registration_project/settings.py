@@ -129,9 +129,13 @@ USE_TZ = True
 
 # Configure static files
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+
+# STATIC_ROOT is where 'collectstatic' command collects static files
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Change this to a different folder
+
+# STATICFILES_DIRS contains the paths where Django will search for additional static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),  # Ensure this points to your static folder
+    os.path.join(BASE_DIR, "static"),  # Keep your project's static files separate
 ]
 
 # Default primary key field type
