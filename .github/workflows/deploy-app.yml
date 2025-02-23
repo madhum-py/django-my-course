@@ -1,0 +1,240 @@
+name: Deploy Django on Remote VM - Dynamic
+
+on:
+  workflow_dispatch:  # Allows manual trigger
+  push:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Azure CLI & SSH Client
+        run: |
+          echo "🚀 Installing Azure CLI..."
+          sudo apt-get update -y
+          sudo apt-get install -y azure-cli openssh-client sshpass jq
+
+      - name: Login to Azure with SPN
+        run: |
+          echo "🔑 Logging into Azure..."
+          az login --service-principal \
+            --username "${{ secrets.SPN_CLIENT_ID }}" \
+            --password "${{ secrets.SPN_SECRET }}" \
+            --tenant "${{ secrets.SPN_TENANT_ID }}"
+
+      - name: Fetch VM Public IP from Azure
+        id: get-vm-ip
+        run: |
+          echo "🔍 Fetching VM Public IP..."
+          VM_IP=$(az vm show -d --resource-group meta-minds-rg --name meta-minds-vm --query publicIps -o tsv)
+          echo "VM_IP=${VM_IP}" >> $GITHUB_ENV
+          echo "✅ Found VM IP: $VM_IP"
+
+      - name: Fetch VM Credentials from Key Vault
+        id: get-vm-creds
+        run: |
+          echo "🔍 Fetching VM credentials from Key Vault..."
+          VM_USERNAME=$(az keyvault secret show --vault-name meta-minds-kv --name vm-username --query value -o tsv)
+          VM_PASSWORD=$(az keyvault secret show --vault-name meta-minds-kv --name vm-password --query value -o tsv)
+
+          echo "::add-mask::$VM_PASSWORD"  # Mask password in logs
+          echo "VM_USERNAME=${VM_USERNAME}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${VM_PASSWORD}" >> $GITHUB_ENV
+          echo "✅ Fetched VM credentials successfully!"
+
+      - name: Connect to VM & Check for Reboot
+        run: |
+          echo "🚀 Checking if VM was rebooted..."
+          sshpass -p "$VM_PASSWORD" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no "$VM_USERNAME@$VM_IP" << 'EOF'
+            if [ -f /tmp/reboot-required-action ]; then
+                echo "🔄 System was rebooted. Removing flag and continuing deployment..."
+                sudo rm -f /tmp/reboot-required-action
+                exit 0
+            fi
+            echo "✅ No reboot detected. Proceeding with system update..."
+          EOF
+
+      - name: Perform System Update & Reboot if Required
+        id: update_system
+        run: |
+          echo "🚀 Updating system..."
+          sshpass -p "$VM_PASSWORD" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no "$VM_USERNAME@$VM_IP" << 'EOF'
+            export DEBIAN_FRONTEND=noninteractive
+            sudo apt update -y && sudo apt upgrade -y
+            sudo apt dist-upgrade -y
+
+            if [ -f /var/run/reboot-required ]; then
+                echo "⚠️ Kernel update detected! Marking reboot-required flag..."
+                sudo touch /tmp/reboot-required-action
+                sudo reboot
+                exit 0
+            fi
+          EOF
+        continue-on-error: true  # Prevents GitHub from marking the job as failed on reboot
+
+      - name: Auto-Retry If Reboot Occurs
+        if: failure() && steps.update_system.outcome == 'failure'
+        run: |
+          echo "⚠️ First run failed due to reboot. GitHub Actions will auto-retry this job."
+          exit 1  # Forces GitHub Actions to retry the workflow
+
+      - name: Connect to VM & Install Django
+        run: |
+          echo "🚀 Connecting to Remote VM for Django Installation..."
+          sshpass -p "$VM_PASSWORD" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no "$VM_USERNAME@$VM_IP" << 'EOF'
+            echo "🚀 Installing required packages..."
+            sudo apt install -y python3 python3-pip
+
+            echo "🚀 Installing Django..."
+            sudo -H pip3 install --upgrade pip
+            sudo -H pip3 install django
+          EOF
+
+      - name: Install & Configure PostgreSQL
+        run: |
+          echo "🚀 Installing PostgreSQL..."
+          sshpass -p "$VM_PASSWORD" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no "$VM_USERNAME@$VM_IP" \
+            "export VM_IP='$VM_IP' && bash -s" << 'EOF'
+            sudo apt update -y
+            sudo apt install -y postgresql postgresql-contrib libpq-dev
+
+            DB_NAME="${{ secrets.DB_NAME }}"
+            DB_USER="${{ secrets.DB_USER }}"
+            DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+
+            echo "🚀 Starting PostgreSQL service..."
+            sudo systemctl enable postgresql
+            sudo systemctl start postgresql
+  
+            echo "🚀 Configuring PostgreSQL User and Database..."
+            sudo -u postgres bash -c "
+            export HOME=/var/lib/postgresql
+            cd ~postgres
+            psql -tAc \"SELECT 1 FROM pg_database WHERE datname='$DB_NAME'\" | grep -q 1 || psql -c \"CREATE DATABASE $DB_NAME;\"
+            psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'\" | grep -q 1 || psql -c \"CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';\"
+            psql -c \"ALTER ROLE $DB_USER SET client_encoding TO 'utf8';\"
+            psql -c \"ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';\"
+            psql -c \"ALTER ROLE $DB_USER SET timezone TO 'UTC';\"
+            psql -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;\"
+            "
+  
+            echo "🚀 Configuring PostgreSQL to accept remote connections..."
+            sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /etc/postgresql/*/main/postgresql.conf
+  
+            echo "host all all 0.0.0.0/0 md5" | sudo tee -a /etc/postgresql/*/main/pg_hba.conf
+  
+            echo "🚀 Restarting PostgreSQL to apply changes..."
+            sudo systemctl restart postgresql
+          EOF
+
+      - name: Deploy Django Application
+        run: |
+            echo "🚀 Connecting to VM and setting up project..."
+            sshpass -p "$VM_PASSWORD" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no "$VM_USERNAME@$VM_IP" << 'EOF'
+              set -e  # Exit on error
+              echo '📂 Navigating to home directory...'
+              cd ~ || exit
+  
+              # ✅ Install Azure CLI if not already installed
+              if ! command -v az &> /dev/null; then
+                  echo "🔧 Installing Azure CLI..."
+                  curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+              else
+                  echo "✅ Azure CLI already installed!"
+              fi
+                
+              # ✅ Log in to Azure using SPN
+              echo "🔑 Logging in to Azure with Service Principal..."
+              az login --service-principal \
+                --username "${{ secrets.SPN_CLIENT_ID }}" \
+                --password "${{ secrets.SPN_SECRET }}" \
+                --tenant "${{ secrets.SPN_TENANT_ID }}"
+  
+              # ✅ Fetch the VM's public IP dynamically
+              echo "🌍 Fetching VM Public IP from Azure..."
+              export DB_HOST=$(az network public-ip show \
+                --resource-group "meta-minds-rg" \
+                --name "meta-minds-public-ip" \
+                --query "ipAddress" \
+                --output tsv)
+  
+              echo "✅ VM Public IP: $DB_HOST"
+  
+              # ✅ Set Database credentials
+              export DB_NAME="${{ secrets.DB_NAME }}"
+              export DB_USER="${{ secrets.DB_USER }}"
+              export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+  
+              # ✅ Handling private repository authentication (if repo is private)
+              if [ ! -d "django-app" ]; then
+                  echo "🚀 Cloning repository..."
+                  git clone https://github.com/madhum-py/django-my-course.git django-app
+              else
+                  echo "🔄 Updating existing repository..."
+                  cd django-app
+                  git reset --hard  # Remove any uncommitted changes
+                  git pull origin master
+              fi
+  
+              cd ~/django-app || { echo "❌ Failed to enter django-app directory!"; exit 1; }
+  
+              # ✅ Ensure static directory exists
+              STATIC_DIR="static"
+              if [ ! -d "$STATIC_DIR" ]; then
+                echo "🚀 Static directory not found. Creating it..."
+                mkdir -p "static"
+              else
+                echo "✅ Static directory already exists."
+              fi
+  
+              echo "🚀 Installing dependencies..."
+              sudo apt update -y
+              sudo apt install -y python3-pip
+              sudo pip3 install --upgrade pip
+              sudo pip3 install requests django-extensions psycopg2-binary
+  
+              echo "🚀 Updating Django settings..."
+              SETTINGS_FILE="registration_project/settings.py"
+  
+              # ✅ Ensure DATABASES section exists and update fields dynamically
+              if grep -q "DATABASES =" "$SETTINGS_FILE"; then
+                  echo "✅ DATABASES section found, updating PostgreSQL settings..."
+                  sudo sed -i "s/'ENGINE': 'django.db.backends.sqlite3'/'ENGINE': 'django.db.backends.postgresql'/" "$SETTINGS_FILE"
+                  sudo sed -i "s|'NAME': BASE_DIR / 'db.sqlite3'|'NAME': '$DB_NAME'|" "$SETTINGS_FILE"
+                  sudo sed -i "s/'USER': '.*'/'USER': '$DB_USER'/" "$SETTINGS_FILE"
+                  sudo sed -i "s/'PASSWORD': '.*'/'PASSWORD': '$DB_PASSWORD'/" "$SETTINGS_FILE"
+                  sudo sed -i "s/'HOST': '.*'/'HOST': '$DB_HOST'/" "$SETTINGS_FILE"
+                  sudo sed -i "s/'PORT': '.*'/'PORT': '5432'/" "$SETTINGS_FILE"
+              else
+                  echo "⚠️ DATABASES section not found! Adding PostgreSQL configuration..."
+                  echo "DATABASES = {" | sudo tee -a "$SETTINGS_FILE"
+                  echo "    'default': {" | sudo tee -a "$SETTINGS_FILE"
+                  echo "        'ENGINE': 'django.db.backends.postgresql'," | sudo tee -a "$SETTINGS_FILE"
+                  echo "        'NAME': '$DB_NAME'," | sudo tee -a "$SETTINGS_FILE"
+                  echo "        'USER': '$DB_USER'," | sudo tee -a "$SETTINGS_FILE"
+                  echo "        'PASSWORD': '$DB_PASSWORD'," | sudo tee -a "$SETTINGS_FILE"
+                  echo "        'HOST': '$DB_HOST'," | sudo tee -a "$SETTINGS_FILE"
+                  echo "        'PORT': '5432'," | sudo tee -a "$SETTINGS_FILE"
+                  echo "    }" | sudo tee -a "$SETTINGS_FILE"
+                  echo "}" | sudo tee -a "$SETTINGS_FILE"
+              fi
+  
+              echo "🚀 Updating ALLOWED_HOSTS in Django settings..."
+              sudo sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = ['*']/" "$SETTINGS_FILE"
+
+              echo "🚀 Running database migrations..."
+              sudo python3 manage.py migrate
+  
+              echo "🚀 Collecting static files..."
+              sudo python3 manage.py collectstatic --noinput
+  
+              echo "🚀 Restarting Django server..."
+              sudo pkill -f runserver || true  # Stop any running instance
+              sudo nohup python3 manage.py runserver 0.0.0.0:8000 > server.log 2>&1 &
+  
+              echo "✅ Django application deployed successfully!"
+            EOF
+  
