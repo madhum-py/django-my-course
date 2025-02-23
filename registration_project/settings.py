@@ -77,9 +77,17 @@ WSGI_APPLICATION = 'registration_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'registration_db',  # Replace with your actual database name
+        'USER': 'postgres',       # Replace with your PostgreSQL username
+        'PASSWORD': 'postgresql123',   # Replace with your PostgreSQL password
+        'HOST': 'localhost',           # Or the IP address of your PostgreSQL server
+        'PORT': '5432',                # Default PostgreSQL port
     }
 }
 
@@ -117,9 +125,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+# Ensure STATIC_ROOT is properly set for collectstatic
 
 # Configure static files
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),  # Ensure this points to your static folder
 ]
